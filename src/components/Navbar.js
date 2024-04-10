@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom"
+import { Link} from "react-router-dom"
 import { useState } from "react";
 import {AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Button} from '@mui/material'
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import FormGroup from '@mui/material/FormGroup';
 import {useAuthContext} from '../hooks/useAuthContext'
+import useLogout from "../hooks/useLogout";
 
 
 export default function Navbar() {
     const [anchorEl, setAnchorEl] = useState(null);
     const {user} = useAuthContext()
+    const {logout} = useLogout()
   
   
     const handleMenu = (event) => {
@@ -16,6 +18,11 @@ export default function Navbar() {
     };
   
     const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+      logout()
       setAnchorEl(null);
     };
 
@@ -57,7 +64,7 @@ export default function Navbar() {
                 onClose={handleClose}
               >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </>
           : 

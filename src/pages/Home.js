@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import {usePostsContext} from '../hooks/usePostsContext'
 import PostDetails from '../components/PostDetails'
+import CreatePost from '../components/CreatePost'
+import { useAuthContext } from '../hooks/useAuthContext'
 
 
 export default function Home() {
   const {posts, dispatch} = usePostsContext()
+  const {user} = useAuthContext()
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -26,6 +29,7 @@ export default function Home() {
 
   return (
     <div>
+      {user && <CreatePost />}
       {posts?.map((post) => (
         <PostDetails key={post._id}  post={post}/>
       ))}

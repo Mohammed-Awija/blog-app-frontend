@@ -13,7 +13,5 @@ export default function useLogout() {
         //set state null after logout
         postDispatch({type: 'GET_POST', payload: null})
     }
-  return (
-    <div>useLogout</div>
-  )
+  return {logout}
 }

@@ -11,7 +11,7 @@ export const postReducer = (state, action) => {
             }
         case 'CREATE_POST':
             return {
-    
+                posts: [action.payload, ...state.posts]
             }
         case 'EDIT_POST':
             return {

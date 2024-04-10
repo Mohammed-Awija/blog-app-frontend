@@ -21,7 +21,7 @@ export default function PostDetails({post}) {
           image={defaultImage}
           alt='default photo'
         />
-        <CardContent>
+        <CardContent  sx={{ textAlign: 'center' }}>
           <Typography variant='h6' color="text.secondary">{post.title}</Typography>
           <Typography variant='body2' color="text.secondary">{post.description}</Typography>
         </CardContent>
