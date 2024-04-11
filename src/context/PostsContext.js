@@ -15,11 +15,12 @@ export const postReducer = (state, action) => {
             }
         case 'EDIT_POST':
             return {
+                posts: state.posts.map((post) => post._id === action.payload._id ? action.payload : post)
         
             }
         case 'DELETE_POST':
             return {
-    
+                posts: state.posts.filter((post) => post._id !== action.payload._id)
             }
         case 'LIKE_POST':
             return {

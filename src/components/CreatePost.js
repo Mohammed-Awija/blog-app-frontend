@@ -30,10 +30,10 @@ export default function CreatePost() {
             'Authorization': `Bearer ${user.token}`
           }
         })
-        const json = await res.json()
-        if(!res.ok){
+        const json = await res.json() 
+        if(!res.ok){ 
           setError(json.error)
-          return;
+          return; 
       }
       setTitle('')
       setDescription('')
@@ -56,12 +56,12 @@ export default function CreatePost() {
       <CardHeader 
       avatar={
           <Avatar sx={{ bgcolor: '#FF5700' }} aria-label='user'>
-            {user && user.username[0]}
+            {user && user.username[0].toUpperCase()}
           </Avatar>
         } 
         action={
-          <IconButton aria-label="close">
-            <CloseIcon onClick={() => setCreate(false)} />
+          <IconButton aria-label="close" onClick={() => setCreate(false)}>
+            <CloseIcon  />
           </IconButton>
         }
         title={user && user.username}
@@ -85,7 +85,7 @@ export default function CreatePost() {
       <CardHeader
       avatar={
           <Avatar sx={{ bgcolor: '#FF5700' }} aria-label='user'>
-            {user && user.username[0]}
+            {user && user.username[0].toUpperCase()}
           </Avatar>
         } 
 

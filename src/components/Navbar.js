@@ -8,22 +8,14 @@ import useLogout from "../hooks/useLogout";
 
 
 export default function Navbar() {
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [showMenu, setShowMenu] = useState(null);
     const {user} = useAuthContext()
     const {logout} = useLogout()
   
-  
-    const handleMenu = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
 
     const handleLogout = () => {
       logout()
-      setAnchorEl(null);
+      setShowMenu(null);
     };
 
     
@@ -43,14 +35,14 @@ export default function Navbar() {
                       aria-label="account of current user"
                       aria-controls="menu-appbar"
                       aria-haspopup="true"
-                      onClick={handleMenu}
+                      onClick={(e) => setShowMenu(e.currentTarget)}
                       color="inherit"
                     >
                   <AccountCircle />
                 </IconButton>
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorEl}
+                anchorEl={showMenu}
                 anchorOrigin={{
                   vertical: 'top',
                   horizontal: 'right',
@@ -60,10 +52,10 @@ export default function Navbar() {
                   vertical: 'top',
                   horizontal: 'right',
                 }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
+                open={Boolean(showMenu)}
+                onClose={() => setShowMenu(null)}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={() => setShowMenu(null)}>Profile</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </>
