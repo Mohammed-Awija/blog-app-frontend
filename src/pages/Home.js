@@ -5,6 +5,7 @@ import CreatePost from '../components/CreatePost'
 import { useAuthContext } from '../hooks/useAuthContext'
 
 
+
 export default function Home() {
   const {posts, dispatch} = usePostsContext()
   const {user} = useAuthContext()
@@ -12,7 +13,12 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/v1')
+        const res = await fetch('/api/v1', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          }
+        })
         if(!res.ok){
           throw new Error('Network response was not ok')
         }

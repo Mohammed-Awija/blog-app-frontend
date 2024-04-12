@@ -1,5 +1,5 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Stack, Menu, MenuItem, TextField, Alert, Button} from '@mui/material'
+import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button} from '@mui/material'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import defaultImage from '../images/default.jpg'
 import IconButton from '@mui/material/IconButton';
@@ -7,6 +7,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
 import {useAuthContext} from '../hooks/useAuthContext'
 import {usePostsContext} from '../hooks/usePostsContext'
+import FavoriteIcon from '@mui/icons-material/Favorite';
+
 
 export default function PostDetails({post}) {
   const [showMenu, setShowMenu] = useState(null)
@@ -16,6 +18,9 @@ export default function PostDetails({post}) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [error, setError] = useState(null)
+  const [id, setId] = useState('')
+
+
 
 const deletePost = async () => {
   try {
@@ -38,9 +43,10 @@ const deletePost = async () => {
   setShowMenu(null)
 }
 
-const editPost = () => {
+const editPost = (post) => {
   setTitle(post.title)
   setDescription(post.description)
+  setId(post._id)
   setEdit(true)
   setShowMenu(null)
 }
@@ -50,11 +56,13 @@ const handleEdit = async (e) => {
   if(!user){
     return setError('You must be logged in!!!')
  }
- const post = {title, description}
     try {
-      const res = await fetch('/api/v1/create-post', {
-        method: 'POST', 
-        body: JSON.stringify(post),
+      const res = await fetch(`/api/v1/edit-post/${id}`, {
+        method: 'PATCH', 
+        body: JSON.stringify({
+          title: title,
+          description: description,
+        }),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
@@ -69,7 +77,32 @@ const handleEdit = async (e) => {
     setDescription('')
     setError(null)
     setEdit(false)
-    dispatch({type: 'CREATE_POST', payload: json})
+    dispatch({type: 'EDIT_POST', payload: json})
+    } catch (error) {
+      console.log(error)
+    }
+}
+
+const likePost = async (post) => {
+
+  if(!user){
+    return setError('You must be logged in!!!')
+ }
+    try {
+      const res = await fetch(`/api/v1/like-post/${post._id}`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        }
+      })
+      const json = await res.json() 
+      if(!res.ok){ 
+        setError(json.error)
+        return; 
+    }
+    setError(null)
+    dispatch({type: 'LIKE_POST', payload: json})
     } catch (error) {
       console.log(error)
     }
@@ -110,7 +143,7 @@ const handleEdit = async (e) => {
                 onClose={() => setShowMenu(null)}
               >
                 <MenuItem onClick={() => setShowMenu(null)}>Save Post</MenuItem>
-                {user.username === post.createdBy ? <MenuItem onClick={editPost}>Edit Post</MenuItem> : null}
+                {user.username === post.createdBy ? <MenuItem onClick={() => editPost(post)}>Edit Post</MenuItem> : null}
                 {user.username === post.createdBy ? <MenuItem onClick={deletePost}>Delete Post</MenuItem> : null}
             </Menu>
         <CardMedia
@@ -133,12 +166,21 @@ const handleEdit = async (e) => {
           </>
           } 
         </CardContent>
-        <Stack direction='row' sx={{ alignItems: 'center', justifyContent: 'space-between', margin: '10px 5px'}}>
-            <Grid sx={{ display: 'flex', margin: '0 5px'}}>
-              <FavoriteBorderOutlinedIcon />
-              <Typography variant='subtitle2' sx={{ margin: '0 5px' }}>{post.likes.length} Likes</Typography>
+        <Grid sx={{flexGrow: 1}} container spacing={2}>
+          <Grid item xs={12}>
+            <Grid container justifyContent="center">
+              <Grid key={0} alignItems='center' sx={{ display: 'flex' }}>
+                <IconButton size='large' onClick={() => likePost(post)}>
+                {post.likes.includes(user.username) ? <FavoriteIcon color='primary' /> : <FavoriteBorderOutlinedIcon color='primary' />}
+                </IconButton>
+                <Typography variant="subtitle2">{post.likes.length} Likes</Typography>
+              </Grid>
             </Grid>
-        </Stack>
+          </Grid>
+        </Grid>
     </Card>
   )
 }
+
+
+//{post.likes.includes(user.username) ? <FavoriteIcon color='primary' /> : <FavoriteBorderOutlinedIcon color='primary' />}

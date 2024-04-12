@@ -15,7 +15,8 @@ export const postReducer = (state, action) => {
             }
         case 'EDIT_POST':
             return {
-                posts: state.posts.map((post) => post._id === action.payload._id ? action.payload : post)
+                posts: state.posts.map((post) => 
+                post._id === action.payload._id ? action.payload : post)
         
             }
         case 'DELETE_POST':
@@ -24,7 +25,8 @@ export const postReducer = (state, action) => {
             }
         case 'LIKE_POST':
             return {
-    
+                posts: state.posts.map((post) => 
+                post._id === action.payload._id ? {...post, likes: action.payload.likes} : post)
             }
         default:
             return state
