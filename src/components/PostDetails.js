@@ -1,5 +1,5 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button} from '@mui/material'
+import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button, Collapse, Stack} from '@mui/material'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import defaultImage from '../images/default.jpg'
 import IconButton from '@mui/material/IconButton';
@@ -8,6 +8,9 @@ import { useState } from 'react';
 import {useAuthContext} from '../hooks/useAuthContext'
 import {usePostsContext} from '../hooks/usePostsContext'
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import ShareIcon from '@mui/icons-material/Share';
+import SendIcon from '@mui/icons-material/Send';
 
 
 export default function PostDetails({post}) {
@@ -19,6 +22,7 @@ export default function PostDetails({post}) {
   const [description, setDescription] = useState('')
   const [error, setError] = useState(null)
   const [id, setId] = useState('')
+  const [expanded, setExpanded] = useState(false);
 
 
 
@@ -108,6 +112,10 @@ const likePost = async (post) => {
     }
 }
 
+const handleComment = () => {
+  setExpanded(!expanded)
+}
+
 
 
   return (
@@ -173,14 +181,43 @@ const likePost = async (post) => {
                 <IconButton size='large' onClick={() => likePost(post)}>
                 {post.likes.includes(user.username) ? <FavoriteIcon color='primary' /> : <FavoriteBorderOutlinedIcon color='primary' />}
                 </IconButton>
-                <Typography variant="subtitle2">{post.likes.length} Likes</Typography>
+                <Typography ml="-10px" variant="subtitle2">{post.likes.length} Likes</Typography>
               </Grid>
+              <Grid key={1} alignItems='center' sx={{ display: 'flex' }}>
+                <IconButton onClick={handleComment}>
+                <ChatBubbleIcon color='primary' />
+                <Typography ml="4px" variant="subtitle2">Comments</Typography>
+                </IconButton>
+              </Grid> 
+              <Grid key={2} alignItems='center' sx={{ display: 'flex' }}>
+                <IconButton>
+                <ShareIcon color='primary' />
+                <Typography ml="4px" variant="subtitle2">Share</Typography>
+                </IconButton>
+              </Grid> 
             </Grid>
           </Grid>
         </Grid>
+        <Collapse sx={{ width: '100%'}} in={expanded}>
+          <CardContent>
+          <Stack direction='row' sx={{ alignItems: 'center',justifyContent: 'space-between', width:'100%'}}>
+            <TextField width="100%" variant='outlined' InputProps={{ sx: { borderRadius: 25, height: '30px'}}} />
+            <IconButton>
+              <SendIcon color='primary' />
+            </IconButton>
+          </Stack>
+          {post.comments.map((comment) => 
+          <Stack m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
+            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
+            <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
+            </Avatar>
+            <Typography variant='subtitle1'>{comment.createdBy}</Typography>
+            <Typography variant='subtitle2'>{comment.comment}</Typography>
+          </Stack>)}
+          </CardContent>
+        </Collapse>
     </Card>
   )
 }
 
 
-//{post.likes.includes(user.username) ? <FavoriteIcon color='primary' /> : <FavoriteBorderOutlinedIcon color='primary' />}
