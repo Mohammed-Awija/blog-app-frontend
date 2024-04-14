@@ -1,5 +1,5 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button, Collapse, Stack} from '@mui/material'
+import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button, Collapse, Stack, InputAdornment} from '@mui/material'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import defaultImage from '../images/default.jpg'
 import IconButton from '@mui/material/IconButton';
@@ -13,16 +13,23 @@ import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
 
 
+
 export default function PostDetails({post}) {
-  const [showMenu, setShowMenu] = useState(null)
+  //hooks
   const {user} = useAuthContext()
   const {dispatch} = usePostsContext()
-  const [edit, setEdit] = useState(false)
+
+  //inputs
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [comment, setComment] = useState('')
+
   const [error, setError] = useState(null)
   const [id, setId] = useState('')
+  const [edit, setEdit] = useState(false)
   const [expanded, setExpanded] = useState(false);
+  const [showMenu, setShowMenu] = useState(null)
+  const [reply, setReply] = useState(false)
 
 
 
@@ -60,6 +67,9 @@ const handleEdit = async (e) => {
   if(!user){
     return setError('You must be logged in!!!')
  }
+ if(id === null){
+  return setError('post id not found')
+}
     try {
       const res = await fetch(`/api/v1/edit-post/${id}`, {
         method: 'PATCH', 
@@ -112,14 +122,43 @@ const likePost = async (post) => {
     }
 }
 
-const handleComment = () => {
-  setExpanded(!expanded)
+const handleComment = async (post) => {
+  try {
+    const res = await fetch(`/api/v1/comment-post/${post._id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        comment: comment,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`
+      }
+    })
+    const json = await res.json() 
+    if(!res.ok){ 
+      setError(json.error)
+      return
+  }
+  setError(null)
+  dispatch({type: 'COMMENT_POST', payload: json})
+  setComment('')
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const handleReply = async (post, comment) => {
+  try {
+    
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 
 
   return (
-    <Card sx={{ maxWidth: '600px', margin: '15px auto' }}>
+    <Card sx={{ maxWidth: '500px', margin: '15px auto' }}>
       {error && <Alert severity="warning">{error}</Alert>}
       <CardHeader 
       avatar={
@@ -184,7 +223,7 @@ const handleComment = () => {
                 <Typography ml="-10px" variant="subtitle2">{post.likes.length} Likes</Typography>
               </Grid>
               <Grid key={1} alignItems='center' sx={{ display: 'flex' }}>
-                <IconButton onClick={handleComment}>
+                <IconButton onClick={() => setExpanded(!expanded)}>
                 <ChatBubbleIcon color='primary' />
                 <Typography ml="4px" variant="subtitle2">Comments</Typography>
                 </IconButton>
@@ -200,19 +239,41 @@ const handleComment = () => {
         </Grid>
         <Collapse sx={{ width: '100%'}} in={expanded}>
           <CardContent>
-          <Stack direction='row' sx={{ alignItems: 'center',justifyContent: 'space-between', width:'100%'}}>
-            <TextField width="100%" variant='outlined' InputProps={{ sx: { borderRadius: 25, height: '30px'}}} />
-            <IconButton>
-              <SendIcon color='primary' />
-            </IconButton>
+          <Stack direction='row' sx={{ maxWidth:'450px', margin: '0 auto'}}>
+            <TextField value={comment} onChange={(e) => setComment(e.target.value)} variant='outlined' InputProps={{
+              sx: { borderRadius: 25, height: '35px', width: '450px'},
+              endAdornment: (
+              <InputAdornment position='end' sx={{
+                marginRight: '-10px',
+               }}>
+                <IconButton onClick={() => handleComment(post)}>
+                  <SendIcon color='primary' />
+                </IconButton>
+              </InputAdornment>)}} 
+            />
           </Stack>
           {post.comments.map((comment) => 
-          <Stack m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
+          <Stack key={comment._id} m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
             <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
             <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
             </Avatar>
             <Typography variant='subtitle1'>{comment.createdBy}</Typography>
             <Typography variant='subtitle2'>{comment.comment}</Typography>
+            {reply ?
+            <Stack direction='row' sx={{ maxWidth:'450px', margin: '0 auto'}}>
+            <TextField value={comment} onChange={(e) => setComment(e.target.value)} variant='outlined' InputProps={{
+              sx: { borderRadius: 25, height: '35px', width: '250px'},
+              endAdornment: (
+              <InputAdornment position='end' sx={{
+                marginRight: '-10px',
+               }}>
+                <IconButton onClick={() => handleComment(post)}>
+                  <SendIcon color='primary' />
+                </IconButton>
+              </InputAdornment>)}} 
+            />
+          </Stack>
+          : <Button onClick={() => setReply(true)} variant='outlined'>Reply</Button>}
           </Stack>)}
           </CardContent>
         </Collapse>

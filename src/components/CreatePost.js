@@ -21,7 +21,7 @@ export default function CreatePost() {
       return setError('You must be logged in!!!')
    }
    const post = {title, description}
-      try {
+      try { 
         const res = await fetch('/api/v1/create-post', {
           method: 'POST', 
           body: JSON.stringify(post),
@@ -49,7 +49,7 @@ export default function CreatePost() {
 
 
   return (
-    <Card sx={{ maxWidth: '600px', margin: '15px auto' }}>
+    <Card sx={{ maxWidth: '500px', margin: '15px auto' }}>
       {error && <Alert severity="warning">{error}</Alert>}
       {create ? 
       <>
