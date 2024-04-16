@@ -33,6 +33,11 @@ export const postReducer = (state, action) => {
                 posts: state.posts.map((post) => 
                 post._id === action.payload._id ? {...post, comments: action.payload.comments } : post)
             }
+        case 'REPLY_POST': 
+            return {
+                posts: state.posts.map((post) => 
+                post._id === action.payload._id ? action.payload : post)
+            }
         default:
             return state
     }

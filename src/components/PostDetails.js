@@ -23,13 +23,14 @@ export default function PostDetails({post}) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [comment, setComment] = useState('')
+  const [commentId, setCommentId] = useState(null)
+  const [reply, setReply] = useState('')
 
   const [error, setError] = useState(null)
   const [id, setId] = useState('')
   const [edit, setEdit] = useState(false)
   const [expanded, setExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(null)
-  const [reply, setReply] = useState(false)
 
 
 
@@ -147,9 +148,27 @@ const handleComment = async (post) => {
   }
 }
 
-const handleReply = async (post, comment) => {
+const submitReply = async (post, commentId, reply) => {
   try {
-    
+    const res = await fetch(`/api/v1/reply-post/${post._id}/${commentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        reply: reply,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`
+      }
+    })
+    const json = await res.json()
+    if(!res.ok){
+      setError(json.error)
+      return
+    }
+    setError(null)
+    dispatch({type: 'REPLY_POST', payload: json})
+    setReply('')
+    setCommentId(null)
   } catch (error) {
     console.log(error)
   }
@@ -245,36 +264,60 @@ const handleReply = async (post, comment) => {
               endAdornment: (
               <InputAdornment position='end' sx={{
                 marginRight: '-10px',
-               }}>
+                }}>
                 <IconButton onClick={() => handleComment(post)}>
                   <SendIcon color='primary' />
                 </IconButton>
               </InputAdornment>)}} 
             />
           </Stack>
-          {post.comments.map((comment) => 
-          <Stack key={comment._id} m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
-            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
-            <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
-            </Avatar>
-            <Typography variant='subtitle1'>{comment.createdBy}</Typography>
-            <Typography variant='subtitle2'>{comment.comment}</Typography>
-            {reply ?
-            <Stack direction='row' sx={{ maxWidth:'450px', margin: '0 auto'}}>
-            <TextField value={comment} onChange={(e) => setComment(e.target.value)} variant='outlined' InputProps={{
-              sx: { borderRadius: 25, height: '35px', width: '250px'},
-              endAdornment: (
-              <InputAdornment position='end' sx={{
-                marginRight: '-10px',
-               }}>
-                <IconButton onClick={() => handleComment(post)}>
+          {post.comments.map((comment) => (
+            <Stack key={comment._id} direction="row" sx={{ alignItems: 'center', width: '100%' }}>
+              <Stack m={1} spacing={1} direction='column' >
+                <Stack spacing={1} direction='row' sx={{ alignItems: 'center' }}>
+                  <Avatar  sx={{ bgcolor: '#FF5700', width: 30, height: 30 }} aria-label='user'>
+                  <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
+                  </Avatar>
+                  <Typography variant='subtitle1'>{comment.createdBy}</Typography>
+                </Stack>
+                <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', maxWidth: '430px' }}>
+                  <Typography sx={{wordWrap: "break-word" }} variant='subtitle2'>{comment.comment}</Typography>
+                </Stack>
+                <Stack>
+                {commentId === comment._id ? 
+                  <Stack spacing={1} direction="row">
+                  <TextField onChange={(e) => setReply(e.target.value)} variant='outlined' InputProps={{
+                  sx: { borderRadius: 25, height: '35px', maxWidth: '400px', width: '380px'},
+                  endAdornment: (
+                  <InputAdornment position='end' sx={{
+                  marginRight: '-10px',
+                }}>
+                <IconButton onClick={() => submitReply(post, commentId, reply)}>
                   <SendIcon color='primary' />
                 </IconButton>
-              </InputAdornment>)}} 
-            />
-          </Stack>
-          : <Button onClick={() => setReply(true)} variant='outlined'>Reply</Button>}
-          </Stack>)}
+                </InputAdornment>)}} 
+                />
+                <Typography sx={{ "&:hover" : {cursor: "pointer"}}} color="primary" onClick={() => setCommentId(null)} variant='subtitle2'>Cancel</Typography>
+              </Stack> :
+                    <Typography sx={{ "&:hover" : {cursor: "pointer"} }} color="primary" onClick={() => setCommentId(comment._id)} variant='subtitle2'>Reply</Typography>
+                  }
+                </Stack>
+                {comment.replies && comment.replies.map((re) => 
+                <Stack>
+                    <Stack spacing={1} direction='row' sx={{ alignItems: 'center', margin: '5px 20px' }}>
+                    <Avatar  sx={{ bgcolor: '#FF5700', width: 30, height: 30 }} aria-label='user'>
+                    <Typography variant='subtitle2'>{re.createdBy[0].toUpperCase()}</Typography>
+                    </Avatar>
+                    <Typography variant='subtitle1'>{re.createdBy}</Typography>
+                    </Stack>
+                  <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', maxWidth: '380px', margin: '10px 20px' }}>
+                    <Typography sx={{wordWrap: "break-word" }} variant='subtitle2'>{re.reply}</Typography>
+                  </Stack>
+                </Stack>
+              )}
+              </Stack>
+            </Stack>
+          ))}
           </CardContent>
         </Collapse>
     </Card>
@@ -282,3 +325,44 @@ const handleReply = async (post, comment) => {
 }
 
 
+/*
+          {post.comments.map((comment) => 
+          <Stack direction="column">
+          <Stack key={comment._id} m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
+            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
+            <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
+            </Avatar>
+            <Typography variant='subtitle1'>{comment.createdBy}</Typography>
+            <Stack >
+            <Typography variant='subtitle2'>{comment.comment}</Typography>
+            </Stack>
+            {commentId === comment._id ?
+              <>
+              <TextField onChange={(e) => setReply(e.target.value)} variant='outlined' InputProps={{
+              sx: { borderRadius: 25, height: '35px', width: '250px'},
+              endAdornment: (
+              <InputAdornment position='end' sx={{
+                marginRight: '-10px',
+              }}>
+                <IconButton onClick={() => submitReply(post, commentId, reply)}>
+                  <SendIcon color='primary' />
+                </IconButton>
+              </InputAdornment>)}} 
+            />
+            <Button onClick={() => setCommentId(null)} variant='text'>Cancel</Button>
+              </>
+            : <Button onClick={() => setCommentId(comment._id)} variant='outlined'>Reply</Button>}
+          </Stack>
+          <Stack>
+          {comment.replies && comment.replies.map((re) => 
+          <Stack spacing={1} direction="row" sx={{ alignItems: 'center', margin: '5px 25px' }}>
+            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
+            <Typography variant='subtitle2'>{re.createdBy[0].toUpperCase()}</Typography>
+            </Avatar>
+            <Typography variant='subtitle1'>{re.createdBy}</Typography>
+            <Typography variant='subtitle2'>{re.reply}</Typography>
+          </Stack>)}
+          </Stack>
+          </Stack>)}
+
+*/
