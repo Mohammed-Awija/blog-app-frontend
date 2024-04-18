@@ -13,6 +13,13 @@ export default function CreatePost() {
   const [create, setCreate] = useState(false)
   const {user} = useAuthContext()
   const {dispatch} = usePostsContext()
+  //image
+  const [image, setImage] = useState()
+
+  const selectedImage = (e) => {
+    const file = e.target.files[0]
+    setImage(file)
+  }
 
   
   const handleSubmit = async (e) => {
@@ -20,20 +27,23 @@ export default function CreatePost() {
     if(!user){
       return setError('You must be logged in!!!')
    }
-   const post = {title, description}
+   const formData = new FormData();
+   formData.append('title', title);
+   formData.append('description', description);
+   formData.append('image', image);
       try { 
         const res = await fetch('/api/v1/create-post', {
           method: 'POST', 
-          body: JSON.stringify(post),
+          body: formData,
           headers: {
-            'Content-Type': 'application/json',
+            //'Content-Type': 'application/json',
             'Authorization': `Bearer ${user.token}`
           }
         })
         const json = await res.json() 
         if(!res.ok){ 
           setError(json.error)
-          return; 
+          return;  
       }
       setTitle('')
       setDescription('')
@@ -69,11 +79,12 @@ export default function CreatePost() {
         <CardMedia
           component='img'
           height='280px'
-          image={defaultImage}
-          alt='default photo'
+          image={image ? URL.createObjectURL(image) : defaultImage}
+          alt={image ? image.name : 'default image'}
         />
         <CardContent>
           <Stack spacing={1} direction='column' >
+            <TextField type='file' onChange={selectedImage} accept='image/*'/>
             <TextField value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined' label="Title"/>
             <TextField value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={5} label="Description..." variant='outlined'/>
             <Button onClick={handleSubmit} variant='contained'>Create Post</Button>
@@ -103,4 +114,25 @@ export default function CreatePost() {
 }
 
 
-//
+/*
+
+        const res = await fetch('/api/v1/create-post', {
+          method: 'POST', 
+          body: post,
+          headers: {
+            //'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          }
+        })
+        const json = await res.json() 
+        if(!res.ok){ 
+          setError(json.error)
+          return;  
+      }
+      setTitle('')
+      setDescription('')
+      setError(null)
+      dispatch({type: 'CREATE_POST', payload: json})
+
+
+      */

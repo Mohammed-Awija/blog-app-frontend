@@ -303,14 +303,14 @@ const submitReply = async (post, commentId, reply) => {
                   }
                 </Stack>
                 {comment.replies && comment.replies.map((re) => 
-                <Stack>
-                    <Stack spacing={1} direction='row' sx={{ alignItems: 'center', margin: '5px 20px' }}>
+                <Stack key={re._id}>
+                    <Stack spacing={1} direction='row' sx={{ alignItems: 'center', margin: '0px 20px' }}>
                     <Avatar  sx={{ bgcolor: '#FF5700', width: 30, height: 30 }} aria-label='user'>
                     <Typography variant='subtitle2'>{re.createdBy[0].toUpperCase()}</Typography>
                     </Avatar>
                     <Typography variant='subtitle1'>{re.createdBy}</Typography>
                     </Stack>
-                  <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', maxWidth: '380px', margin: '10px 20px' }}>
+                  <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', width: 'auto', margin: '5px 20px' }}>
                     <Typography sx={{wordWrap: "break-word" }} variant='subtitle2'>{re.reply}</Typography>
                   </Stack>
                 </Stack>
