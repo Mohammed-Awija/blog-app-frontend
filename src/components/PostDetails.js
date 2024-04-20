@@ -22,6 +22,7 @@ export default function PostDetails({post}) {
   //inputs
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [image, setImage] = useState(null)
   const [comment, setComment] = useState('')
   const [commentId, setCommentId] = useState(null)
   const [reply, setReply] = useState('')
@@ -32,7 +33,11 @@ export default function PostDetails({post}) {
   const [expanded, setExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(null)
 
-
+  const selectedImage = (e) => {
+    const file = e.target.files[0]
+    setImage(file)
+  }
+ 
 
 const deletePost = async () => {
   try {
@@ -58,45 +63,51 @@ const deletePost = async () => {
 const editPost = (post) => {
   setTitle(post.title)
   setDescription(post.description)
+  setImage(null)
   setId(post._id)
   setEdit(true)
   setShowMenu(null)
 }
 
 const handleEdit = async (e) => {
-  e.preventDefault()
-  if(!user){
-    return setError('You must be logged in!!!')
- }
- if(id === null){
-  return setError('post id not found')
-}
-    try {
-      const res = await fetch(`/api/v1/edit-post/${id}`, {
-        method: 'PATCH', 
-        body: JSON.stringify({
-          title: title,
-          description: description,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
-        }
-      })
-      const json = await res.json() 
-      if(!res.ok){ 
-        setError(json.error)
-        return; 
+  e.preventDefault();
+  if (!user) {
+    return setError('You must be logged in!!!');
+  }
+  if (id === null) {
+    return setError('Post id not found');
+  }
+  if(post.title === title && post.description === description && image === null){
+    return setError('No no changes are made')
+  }
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  formData.append('image', image); // Append the file data to the form data
+
+  try {
+    const res = await fetch(`/api/v1/edit-post/${id}`, {
+      method: 'PATCH',
+      body: formData, // Send form data instead of JSON.stringify
+      headers: { 
+        'Authorization': `Bearer ${user.token}`
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      setError(json.error);
+      return;
     }
-    setTitle('')
-    setDescription('')
-    setError(null)
-    setEdit(false)
-    dispatch({type: 'EDIT_POST', payload: json})
-    } catch (error) {
-      console.log(error)
-    }
-}
+    setTitle('');
+    setDescription('');
+    setError(null);
+    setEdit(false);
+    setImage(null)
+    dispatch({ type: 'EDIT_POST', payload: json });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const likePost = async (post) => {
 
@@ -212,21 +223,29 @@ const submitReply = async (post, commentId, reply) => {
                 {user.username === post.createdBy ? <MenuItem onClick={() => editPost(post)}>Edit Post</MenuItem> : null}
                 {user.username === post.createdBy ? <MenuItem onClick={deletePost}>Delete Post</MenuItem> : null}
             </Menu>
-        <CardMedia
-          component='img'
-          height='280px'
-          image={defaultImage}
-          alt='default photo'
-        />
         <CardContent  sx={{ textAlign: 'center' }}>
           {edit ? 
           <>
+          <CardMedia
+          component='img'
+          height='280px'
+          image={image ? URL.createObjectURL(image) : post.imageUrl}
+          alt={post.imageName}
+        />
+          <TextField type='file' onChange={selectedImage} accept='image/*'/>
           <TextField value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined'/>
           <TextField value={description} onChange={(e) => setDescription(e.target.value)} variant='outlined'/>
           <Button onClick={handleEdit} variant='contained'>Submit</Button>
+          <Button onClick={() => setEdit(false)} variant='contained'>Cancel</Button>
           </>
           :
           <>
+          <CardMedia
+          component='img'
+          height='280px'
+          image={post.imageUrl}
+          alt={post.imageName}
+        />
           <Typography variant='h6' color="text.secondary">{post.title}</Typography>
           <Typography variant='body2' color="text.secondary">{post.description}</Typography>
           </>

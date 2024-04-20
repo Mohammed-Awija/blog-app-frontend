@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {usePostsContext} from '../hooks/usePostsContext'
 
-export default function CreatePost() {
+export default function CreatePost() { 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [error, setError] = useState(null)
@@ -14,7 +14,7 @@ export default function CreatePost() {
   const {user} = useAuthContext()
   const {dispatch} = usePostsContext()
   //image
-  const [image, setImage] = useState()
+  const [image, setImage] = useState(null)
 
   const selectedImage = (e) => {
     const file = e.target.files[0]
@@ -47,7 +47,9 @@ export default function CreatePost() {
       }
       setTitle('')
       setDescription('')
+      setImage(null)
       setError(null)
+      setCreate(false)
       dispatch({type: 'CREATE_POST', payload: json})
       } catch (error) {
         console.log(error)

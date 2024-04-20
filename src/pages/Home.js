@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <div>
-      {user && <CreatePost />}
+      {user && <CreatePost />} 
       {posts?.map((post) => (
         <PostDetails key={post._id}  post={post}/>
       ))}
