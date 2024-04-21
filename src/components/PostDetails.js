@@ -1,7 +1,6 @@
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import {Card, CardHeader, CardMedia, CardContent, Avatar, Typography, Grid, Menu, MenuItem, TextField, Alert, Button, Collapse, Stack, InputAdornment} from '@mui/material'
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import defaultImage from '../images/default.jpg'
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
@@ -227,6 +226,7 @@ const submitReply = async (post, commentId, reply) => {
           {edit ? 
           <>
           <CardMedia
+          sx={{ width: '100%' }}
           component='img'
           height='280px'
           image={image ? URL.createObjectURL(image) : post.imageUrl}

@@ -8,7 +8,7 @@ import { useAuthContext } from '../hooks/useAuthContext'
 
 export default function Home() {
   const {posts, dispatch} = usePostsContext()
-  const {user} = useAuthContext()
+  const {user, dispatch: authDispatch} = useAuthContext()
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -20,6 +20,10 @@ export default function Home() {
           }
         })
         if(!res.ok){
+          if (res.status === 401) {
+            authDispatch({ type: 'LOGOUT' });
+            localStorage.removeItem('user');
+          }
           throw new Error('Network response was not ok')
         }
         const json = await res.json()
@@ -29,7 +33,7 @@ export default function Home() {
       }
     }
     fetchPosts()
-  }, [dispatch])
+  }, [dispatch, authDispatch, user.token])
 
 
 

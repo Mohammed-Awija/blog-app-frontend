@@ -7,22 +7,20 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import { useAuthContext } from "./hooks/useAuthContext";
 
-
-
-
+ 
 function App() {
-  const {user} = useAuthContext()
+  const {user} = useAuthContext() 
   return (
     <div>
       <ThemeProvider theme={theme}>
       <BrowserRouter>
       <Navbar />
-        <Routes>
+        <Routes> 
           <Route path='/' element={user ? <Home /> : <Login />}/>
           <Route path='/login' element={user ? <Home /> : <Login />}/>
           <Route path='/signup' element={user ? <Home /> : <Signup />}/>
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter> 
       </ThemeProvider>
     </div>
   );
