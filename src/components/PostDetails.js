@@ -10,6 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
+import {menu, style} from '../themes/defaultTheme.js'
 
 
 
@@ -187,7 +188,7 @@ const submitReply = async (post, commentId, reply) => {
 
 
   return (
-    <Card sx={{ maxWidth: '500px', margin: '15px auto' }}>
+    <Card sx={{ maxWidth: '500px', margin: '15px auto', backgroundColor: '#242526' }}>
       {error && <Alert severity="warning">{error}</Alert>}
       <CardHeader 
       avatar={
@@ -196,14 +197,15 @@ const submitReply = async (post, commentId, reply) => {
           </Avatar>
         } 
         action={
-          <IconButton aria-label="settings" onClick={(e) => setShowMenu(e.currentTarget)}>
+          <IconButton sx={{ color: style.textColor }} aria-label="settings" onClick={(e) => setShowMenu(e.currentTarget)}>
             <MoreVertIcon />
           </IconButton>
         }
-        title={user.username === post.createdBy ? "You" : post.createdBy}
-        subheader={formatDistanceToNow(new Date(post.createdAt), {addSuffix: true})}
+        title={user.username === post.createdBy ? <Typography variant='subtitle1' color='	#e4e6eb'>You</Typography> : <Typography variant='subtitle1' color='	#e4e6eb'>{user && user.username}</Typography>}
+        subheader={<Typography color={style.textColor} variant='subtitle2'>{formatDistanceToNow(new Date(post.createdAt), {addSuffix: true})}</Typography>}
         />
                 <Menu
+                sx={menu}
                 id="menu-appbar"
                 anchorEl={showMenu}
                 anchorOrigin={{
@@ -222,16 +224,25 @@ const submitReply = async (post, commentId, reply) => {
                 {user.username === post.createdBy ? <MenuItem onClick={() => editPost(post)}>Edit Post</MenuItem> : null}
                 {user.username === post.createdBy ? <MenuItem onClick={deletePost}>Delete Post</MenuItem> : null}
             </Menu>
+            {edit ? 
+              <CardMedia
+                component='img'
+                height='280px'
+                image={post.imageUrl}
+                alt={post.imageName}
+              />
+            : 
+              <CardMedia
+                sx={{ width: '100%' }}
+                component='img'
+                height='280px'
+                image={image ? URL.createObjectURL(image) : post.imageUrl}
+                alt={post.imageName}
+              />
+                    }
         <CardContent  sx={{ textAlign: 'center' }}>
           {edit ? 
           <>
-          <CardMedia
-          sx={{ width: '100%' }}
-          component='img'
-          height='280px'
-          image={image ? URL.createObjectURL(image) : post.imageUrl}
-          alt={post.imageName}
-        />
           <TextField type='file' onChange={selectedImage} accept='image/*'/>
           <TextField value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined'/>
           <TextField value={description} onChange={(e) => setDescription(e.target.value)} variant='outlined'/>
@@ -240,46 +251,32 @@ const submitReply = async (post, commentId, reply) => {
           </>
           :
           <>
-          <CardMedia
-          component='img'
-          height='280px'
-          image={post.imageUrl}
-          alt={post.imageName}
-        />
-          <Typography variant='h6' color="text.secondary">{post.title}</Typography>
-          <Typography variant='body2' color="text.secondary">{post.description}</Typography>
+          <Typography variant='h6' color={style.textColor}>{post.title}</Typography>
+          <Typography variant='body2' color={style.textColor}>{post.description}</Typography>
           </>
           } 
         </CardContent>
-        <Grid sx={{flexGrow: 1}} container spacing={2}>
-          <Grid item xs={12}>
-            <Grid container justifyContent="center">
-              <Grid key={0} alignItems='center' sx={{ display: 'flex' }}>
+        <Stack>
+            <Grid container justifyContent="space-around" >
+              <Grid alignItems='center' sx={{ display: 'flex' }}>
                 <IconButton size='large' onClick={() => likePost(post)}>
                 {post.likes.includes(user.username) ? <FavoriteIcon color='primary' /> : <FavoriteBorderOutlinedIcon color='primary' />}
                 </IconButton>
-                <Typography ml="-10px" variant="subtitle2">{post.likes.length} Likes</Typography>
+                <Typography color={style.textColor} ml="-10px" variant="subtitle2">{post.likes.length} Likes</Typography>
               </Grid>
-              <Grid key={1} alignItems='center' sx={{ display: 'flex' }}>
+              <Grid alignItems='center' sx={{ display: 'flex' }}>
                 <IconButton onClick={() => setExpanded(!expanded)}>
                 <ChatBubbleIcon color='primary' />
-                <Typography ml="4px" variant="subtitle2">Comments</Typography>
-                </IconButton>
-              </Grid> 
-              <Grid key={2} alignItems='center' sx={{ display: 'flex' }}>
-                <IconButton>
-                <ShareIcon color='primary' />
-                <Typography ml="4px" variant="subtitle2">Share</Typography>
+                <Typography color={style.textColor} ml="4px" variant="subtitle2">Comments</Typography>
                 </IconButton>
               </Grid> 
             </Grid>
-          </Grid>
-        </Grid>
+        </Stack>
         <Collapse sx={{ width: '100%'}} in={expanded}>
           <CardContent>
           <Stack direction='row' sx={{ maxWidth:'450px', margin: '0 auto'}}>
             <TextField value={comment} onChange={(e) => setComment(e.target.value)} variant='outlined' InputProps={{
-              sx: { borderRadius: 25, height: '35px', width: '450px'},
+              sx: { borderRadius: 25, height: '35px', width: '450px', color: style.textColor},
               endAdornment: (
               <InputAdornment position='end' sx={{
                 marginRight: '-10px',
@@ -291,22 +288,27 @@ const submitReply = async (post, commentId, reply) => {
             />
           </Stack>
           {post.comments.map((comment) => (
-            <Stack key={comment._id} direction="row" sx={{ alignItems: 'center', width: '100%' }}>
-              <Stack m={1} spacing={1} direction='column' >
+            <Stack key={comment._id} direction="row" sx={{ alignItems: 'center'}}>
+              <Stack m={1} spacing={1} direction='column' sx={{ width: '100%' }} >
                 <Stack spacing={1} direction='row' sx={{ alignItems: 'center' }}>
                   <Avatar  sx={{ bgcolor: '#FF5700', width: 30, height: 30 }} aria-label='user'>
-                  <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
+                  <Typography variant='subtitle1'>{post.createdBy[0].toUpperCase()}</Typography>
                   </Avatar>
-                  <Typography variant='subtitle1'>{comment.createdBy}</Typography>
+                  <Typography color={style.textColor} variant='subtitle1'>{comment.createdBy}</Typography>
                 </Stack>
-                <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', maxWidth: '430px' }}>
-                  <Typography sx={{wordWrap: "break-word" }} variant='subtitle2'>{comment.comment}</Typography>
-                </Stack>
-                <Stack>
+                <Typography sx={{
+                borderRadius: '10px', 
+                backgroundColor: style.darkBgColor ,
+                padding: '10px',
+                wordWrap: "break-word",
+                color: style.textColor,
+                width: '150px'
+                }} variant='subtitle2'>{comment.comment}</Typography>
+                <Stack sx={{ maxWidth: '440px'}}>
                 {commentId === comment._id ? 
                   <Stack spacing={1} direction="row">
                   <TextField onChange={(e) => setReply(e.target.value)} variant='outlined' InputProps={{
-                  sx: { borderRadius: 25, height: '35px', maxWidth: '400px', width: '380px'},
+                  sx: { borderRadius: 25, height: '35px', maxWidth: '400px', width: '380px', color: style.textColor},
                   endAdornment: (
                   <InputAdornment position='end' sx={{
                   marginRight: '-10px',
@@ -325,13 +327,19 @@ const submitReply = async (post, commentId, reply) => {
                 <Stack key={re._id}>
                     <Stack spacing={1} direction='row' sx={{ alignItems: 'center', margin: '0px 20px' }}>
                     <Avatar  sx={{ bgcolor: '#FF5700', width: 30, height: 30 }} aria-label='user'>
-                    <Typography variant='subtitle2'>{re.createdBy[0].toUpperCase()}</Typography>
+                    <Typography variant='subtitle1'>{re.createdBy[0].toUpperCase()}</Typography>
                     </Avatar>
-                    <Typography variant='subtitle1'>{re.createdBy}</Typography>
+                    <Typography color={style.textColor} variant='subtitle1'>{re.createdBy}</Typography>
                     </Stack>
-                  <Stack sx={{ backgroundColor: '#F0F0F0', padding: '10px', borderRadius: '10px', width: 'auto', margin: '5px 20px' }}>
-                    <Typography sx={{wordWrap: "break-word" }} variant='subtitle2'>{re.reply}</Typography>
-                  </Stack>
+                    <Typography sx={{
+                    borderRadius: '10px', 
+                    backgroundColor: style.darkBgColor ,
+                    padding: '10px',
+                    wordWrap: "break-word",
+                    color: style.textColor,
+                    width: '150px',
+                    margin: '5px 20px'
+                    }} variant='subtitle2'>{re.reply}</Typography>
                 </Stack>
               )}
               </Stack>
@@ -343,45 +351,3 @@ const submitReply = async (post, commentId, reply) => {
   )
 }
 
-
-/*
-          {post.comments.map((comment) => 
-          <Stack direction="column">
-          <Stack key={comment._id} m={1} spacing={1} direction='row' sx={{ alignItems: 'center' }}> 
-            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
-            <Typography variant='subtitle2'>{post.createdBy[0].toUpperCase()}</Typography>
-            </Avatar>
-            <Typography variant='subtitle1'>{comment.createdBy}</Typography>
-            <Stack >
-            <Typography variant='subtitle2'>{comment.comment}</Typography>
-            </Stack>
-            {commentId === comment._id ?
-              <>
-              <TextField onChange={(e) => setReply(e.target.value)} variant='outlined' InputProps={{
-              sx: { borderRadius: 25, height: '35px', width: '250px'},
-              endAdornment: (
-              <InputAdornment position='end' sx={{
-                marginRight: '-10px',
-              }}>
-                <IconButton onClick={() => submitReply(post, commentId, reply)}>
-                  <SendIcon color='primary' />
-                </IconButton>
-              </InputAdornment>)}} 
-            />
-            <Button onClick={() => setCommentId(null)} variant='text'>Cancel</Button>
-              </>
-            : <Button onClick={() => setCommentId(comment._id)} variant='outlined'>Reply</Button>}
-          </Stack>
-          <Stack>
-          {comment.replies && comment.replies.map((re) => 
-          <Stack spacing={1} direction="row" sx={{ alignItems: 'center', margin: '5px 25px' }}>
-            <Avatar  sx={{ bgcolor: '#FF5700', width: 25, height: 25 }} aria-label='user'>
-            <Typography variant='subtitle2'>{re.createdBy[0].toUpperCase()}</Typography>
-            </Avatar>
-            <Typography variant='subtitle1'>{re.createdBy}</Typography>
-            <Typography variant='subtitle2'>{re.reply}</Typography>
-          </Stack>)}
-          </Stack>
-          </Stack>)}
-
-*/

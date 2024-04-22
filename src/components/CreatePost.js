@@ -1,10 +1,11 @@
-import {Card, CardHeader, CardMedia, CardContent, Avatar, TextField, Stack, Button, Alert } from '@mui/material'
+import {Card, CardHeader, CardMedia, CardContent, Avatar, TextField, Stack, Button, Alert, Typography } from '@mui/material'
 import defaultImage from '../images/default.jpg'
 import { useState } from 'react'
 import {useAuthContext} from '../hooks/useAuthContext'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {usePostsContext} from '../hooks/usePostsContext'
+import { inputStyle, textFieldStyle } from '../themes/defaultTheme';
 
 export default function CreatePost() { 
   const [title, setTitle] = useState('')
@@ -15,6 +16,8 @@ export default function CreatePost() {
   const {dispatch} = usePostsContext()
   //image
   const [image, setImage] = useState(null)
+
+
 
   const selectedImage = (e) => {
     const file = e.target.files[0]
@@ -61,22 +64,22 @@ export default function CreatePost() {
 
 
   return (
-    <Card sx={{ maxWidth: '500px', margin: '15px auto' }}>
+    <Card sx={{ maxWidth: '500px', margin: '15px auto', backgroundColor: '#242526' }}>
       {error && <Alert severity="warning">{error}</Alert>}
       {create ? 
       <>
       <CardHeader 
       avatar={
-          <Avatar sx={{ bgcolor: '#FF5700' }} aria-label='user'>
+          <Avatar sx={{ bgcolor: '#FF5700'}} aria-label='user'>
             {user && user.username[0].toUpperCase()}
           </Avatar>
         } 
         action={
-          <IconButton aria-label="close" onClick={() => setCreate(false)}>
+          <IconButton sx={{ color: "#b0b3b8", }} aria-label="close" onClick={() => setCreate(false)}>
             <CloseIcon  />
           </IconButton>
         }
-        title={user && user.username}
+        title={<Typography variant='subtitle1' color='	#e4e6eb'>{user && user.username}</Typography>}
         />
         <CardMedia
           component='img'
@@ -85,56 +88,32 @@ export default function CreatePost() {
           alt={image ? image.name : 'default image'}
         />
         <CardContent>
-          <Stack spacing={1} direction='column' >
-            <TextField type='file' onChange={selectedImage} accept='image/*'/>
-            <TextField value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined' label="Title"/>
-            <TextField value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={5} label="Description..." variant='outlined'/>
+          <Stack spacing={1.5} direction='column' >
+            <TextField sx={inputStyle} type='file' onChange={selectedImage} accept='image/*'/>
+            <TextField sx={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined' label="Title"/>
+            <TextField sx={inputStyle} value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={5} label="Description..." variant='outlined'/>
             <Button onClick={handleSubmit} variant='contained'>Create Post</Button>
           </Stack>
         </CardContent>
       
       </> : 
-      <>
+      <Stack direction='row'>
       <CardHeader
       avatar={
-          <Avatar sx={{ bgcolor: '#FF5700' }} aria-label='user'>
+          <Avatar sx={{ bgcolor: '#FF5700'}} aria-label='user'>
             {user && user.username[0].toUpperCase()}
           </Avatar>
         } 
-
-        title={user && user.username}
+        
+        title={<Typography variant='subtitle1' color='	#e4e6eb'>{user && user.username}</Typography>}
         />
+        
         <CardContent>
-          <Stack direction='column' >
-          <TextField onFocus={() => setCreate(true)} variant='outlined' label="What's on your mind?"/>
-          </Stack>
+          <TextField sx={ textFieldStyle }
+        onFocus={() => setCreate(true)} variant='outlined' label="What's on your mind?"/>
         </CardContent>
-      </>
+      </Stack>
       }
     </Card>
   )
 }
-
-
-/*
-
-        const res = await fetch('/api/v1/create-post', {
-          method: 'POST', 
-          body: post,
-          headers: {
-            //'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-          }
-        })
-        const json = await res.json() 
-        if(!res.ok){ 
-          setError(json.error)
-          return;  
-      }
-      setTitle('')
-      setDescription('')
-      setError(null)
-      dispatch({type: 'CREATE_POST', payload: json})
-
-
-      */

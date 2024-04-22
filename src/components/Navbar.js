@@ -5,7 +5,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import FormGroup from '@mui/material/FormGroup';
 import {useAuthContext} from '../hooks/useAuthContext'
 import useLogout from "../hooks/useLogout";
-
+import { menu, style } from "../themes/defaultTheme";
 
 export default function Navbar() {
     const [showMenu, setShowMenu] = useState(null);
@@ -26,7 +26,7 @@ export default function Navbar() {
       <AppBar position="static">
         <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {<Link to='/' style={{ textDecoration: 'none', color: 'black' }}>Home</Link>}
+              {<Link to='/' style={{ textDecoration: 'none', color: style.textColor }}>Home</Link>}
               </Typography>
             <div>
             {user ? <>
@@ -41,6 +41,7 @@ export default function Navbar() {
                   <AccountCircle />
                 </IconButton>
               <Menu
+                sx={menu}
                 id="menu-appbar"
                 anchorEl={showMenu}
                 anchorOrigin={{
@@ -55,7 +56,6 @@ export default function Navbar() {
                 open={Boolean(showMenu)}
                 onClose={() => setShowMenu(null)}
               >
-                <MenuItem onClick={() => setShowMenu(null)}>Profile</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </>
