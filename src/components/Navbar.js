@@ -7,6 +7,7 @@ import {useAuthContext} from '../hooks/useAuthContext'
 import useLogout from "../hooks/useLogout";
 import { menu, style } from "../themes/defaultTheme";
 
+
 export default function Navbar() {
     const [showMenu, setShowMenu] = useState(null);
     const {user} = useAuthContext()
@@ -26,7 +27,7 @@ export default function Navbar() {
       <AppBar position="static">
         <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {<Link to='/' style={{ textDecoration: 'none', color: style.textColor }}>Home</Link>}
+              {<Link to='/' style={{ textDecoration: 'none', color: style.textColor }}>Blog App</Link>}
               </Typography>
             <div>
             {user ? <>
@@ -61,8 +62,8 @@ export default function Navbar() {
           </>
           : 
           <Box>
-            <Button variant="text" sx={{ backgroundColor: 'white' , margin: '0 5px'}}>{<Link to='/login' style={{ textDecoration: 'none', color: 'black' }}>Login</Link>}</Button>
-            <Button variant="text" sx={{ backgroundColor: 'white' , margin: '0 5px'}}>{<Link to='/signup' style={{ textDecoration: 'none', color: 'black' }}>Signup</Link>}</Button>
+            <Button variant="text">{<Link to='/login' style={{ textDecoration: 'none', color: style.textColor }}>Login</Link>}</Button>
+            <Button variant="text">{<Link to='/signup' style={{ textDecoration: 'none', color: style.textColor }}>Signup</Link>}</Button>
           </Box>
           }
             </div>

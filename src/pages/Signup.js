@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import { useSignup } from '../hooks/useSignup'
-
+import {Stack, Typography, TextField, Button} from '@mui/material'
+import { style } from '../themes/defaultTheme'
 
 export default function Signup() {
     const [username, setUsername] = useState('')
@@ -16,38 +17,82 @@ export default function Signup() {
     }
 
   return (
-    <div>
-        <h2>Sign up</h2>
-        {loading ? "Loading..." :
-        <form onSubmit={handleSubmit}>
+    <Stack direction='column' sx={{ alignItems: 'center', margin: '100px 0' }}>
+        <Typography color={style.textColor} m={1} variant='h4'>Sign up</Typography>
+        {loading ? <Typography variant='subtitle2' color={style.textColor}>Loading...</Typography> :
+        <Stack spacing={1} width='360px'>
             {error && <h3>{error}</h3>}
-            <label>Username</label>
-            <input 
+            <TextField 
+            sx={{ 
+              "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: `solid 0.5px ${style.main}`
+                },
+              },
+              "& .MuiInputLabel-outlined": {
+                color: style.textColor,
+              },
+              }}
             type='text'
+            variant='outlined' label="Username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
             />
-            <label>Email</label>
-            <input 
+            <TextField 
+            sx={{ 
+              "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: `solid 0.5px ${style.main}`
+                },
+              },
+              "& .MuiInputLabel-outlined": {
+                color: style.textColor,
+              },
+              }}
             type='text'
+            variant='outlined' label="Email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             />
-            <label>Password</label>
-            <input 
+            <TextField 
+            sx={{ 
+                "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                border: `solid 0.5px ${style.main}`
+              },
+            },
+            "& .MuiInputLabel-outlined": {
+            color: style.textColor,
+            },
+            }}
             type='password'
+            label="Password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             />
-            <label>Confirm Password</label>
-            <input 
+                        <TextField 
+            sx={{ 
+                "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                border: `solid 0.5px ${style.main}`
+              },
+            },
+            "& .MuiInputLabel-outlined": {
+            color: style.textColor,
+            },
+            }}
             type='password'
+            label="Confirm Password"
             onChange={(e) => setConfirmPassword(e.target.value)}
             value={confirmPassword}
             />
-            <button disabled={loading}>Sign up</button>
-        </form>
+            <Button variant='contained' onClick={handleSubmit} disabled={loading}>Sign up</Button>
+        </Stack>
         }
-    </div>
+    </Stack>
   )
 }

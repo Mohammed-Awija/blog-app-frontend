@@ -1,9 +1,9 @@
-import { colors } from "@mui/material"
 
 export const style = {
     textColor: '#e4e6eb',
     darkBgColor: '#18191a',
     bgcolor: '#242526',
+    main: '#FF5700',
 }
 
 export const inputStyle = {
@@ -35,7 +35,7 @@ export const textFieldStyle = {
         color: "#b0b3b8",
       },
       backgroundColor: "#3a3b3c",
-      width: '340px', height: '50px',
+      width: '320px', height: '50px',
       borderRadius: '25px', border: 'none',
       marginRight: '10px',
     

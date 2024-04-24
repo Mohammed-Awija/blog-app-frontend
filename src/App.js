@@ -19,6 +19,7 @@ function App() {
           <Route path='/' element={user ? <Home /> : <Login />}/>
           <Route path='/login' element={user ? <Home /> : <Login />}/>
           <Route path='/signup' element={user ? <Home /> : <Signup />}/>
+          <Route path='*' element={user ? <Home /> : <Signup />}/>
         </Routes>
       </BrowserRouter> 
       </ThemeProvider>

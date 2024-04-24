@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {useLogin} from '../hooks/useLogin'
-
+import {Stack, Typography, TextField, Button} from '@mui/material'
+import { style } from '../themes/defaultTheme'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -14,26 +15,48 @@ export default function Login() {
     }
 
   return (
-    <div>
-        <h2>Login</h2>
-        {loading ? "Loading..." :
-        <form onSubmit={handleSubmit}>
+    <Stack direction='column' sx={{ alignItems: 'center', margin: '100px 0' }}>
+        <Typography color={style.textColor} m={1} variant='h4'>Login</Typography>
+        {loading ? <Typography variant='subtitle2' color={style.textColor}>Loading...</Typography> :
+        <Stack spacing={1} width='360px'>
           {error && <h3>{error}</h3>}
-            <label>Email</label>
-            <input 
+            <TextField 
+            sx={{ 
+              "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: `solid 0.5px ${style.main}`
+                },
+              },
+              "& .MuiInputLabel-outlined": {
+                color: style.textColor,
+              },
+              }}
             type='text'
+            variant='outlined' label="Email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
             />
-            <label>Password</label>
-            <input 
+            <TextField 
+            sx={{ 
+                "& .MuiOutlinedInput-root": {
+                color: "#b0b3b8",
+                "& .MuiOutlinedInput-notchedOutline": {
+                border: `solid 0.5px ${style.main}`
+              },
+            },
+            "& .MuiInputLabel-outlined": {
+            color: style.textColor,
+            },
+            }}
             type='password'
+            label="Password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             />
-            <button disabled={loading}>Login</button>
-        </form>
+            <Button variant='contained' onClick={handleSubmit} disabled={loading}>Login</Button>
+        </Stack>
         }
-    </div>
+    </Stack>
   )
 }

@@ -8,9 +8,8 @@ import {useAuthContext} from '../hooks/useAuthContext'
 import {usePostsContext} from '../hooks/usePostsContext'
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
-import {menu, style} from '../themes/defaultTheme.js'
+import {inputStyle, menu, style} from '../themes/defaultTheme.js'
 
 
 
@@ -32,6 +31,7 @@ export default function PostDetails({post}) {
   const [edit, setEdit] = useState(false)
   const [expanded, setExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(null)
+  const [showFullDescription , setShowFullDescription] = useState(false)
 
   const selectedImage = (e) => {
     const file = e.target.files[0]
@@ -201,7 +201,7 @@ const submitReply = async (post, commentId, reply) => {
             <MoreVertIcon />
           </IconButton>
         }
-        title={user.username === post.createdBy ? <Typography variant='subtitle1' color='	#e4e6eb'>You</Typography> : <Typography variant='subtitle1' color='	#e4e6eb'>{user && user.username}</Typography>}
+        title={user.username === post.createdBy ? <Typography variant='subtitle1' color='	#e4e6eb'>You</Typography> : <Typography variant='subtitle1' color='	#e4e6eb'>{post && post.createdBy}</Typography>}
         subheader={<Typography color={style.textColor} variant='subtitle2'>{formatDistanceToNow(new Date(post.createdAt), {addSuffix: true})}</Typography>}
         />
                 <Menu
@@ -242,18 +242,25 @@ const submitReply = async (post, commentId, reply) => {
                     }
         <CardContent  sx={{ textAlign: 'center' }}>
           {edit ? 
-          <>
-          <TextField type='file' onChange={selectedImage} accept='image/*'/>
-          <TextField value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined'/>
-          <TextField value={description} onChange={(e) => setDescription(e.target.value)} variant='outlined'/>
+          <Stack spacing={1}>
+          <TextField sx={ inputStyle } type='file' onChange={selectedImage} accept='image/*'/>
+          <TextField sx={ inputStyle } value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined'/>
+          <TextField multiline rows={Math.max(Math.ceil(description.length / 40), 2)} sx={ inputStyle }  value={description} onChange={(e) => setDescription(e.target.value)} variant='outlined'/>
           <Button onClick={handleEdit} variant='contained'>Submit</Button>
           <Button onClick={() => setEdit(false)} variant='contained'>Cancel</Button>
-          </>
+          </Stack>
           :
-          <>
+          <Stack>
           <Typography variant='h6' color={style.textColor}>{post.title}</Typography>
-          <Typography variant='body2' color={style.textColor}>{post.description}</Typography>
-          </>
+          <Typography multiline  variant='subtitle1' color={style.textColor}>
+            {showFullDescription ? post.description : `${post.description.slice(0, 300)}...`}
+            
+            {post.description.length > 100 && !showFullDescription && (
+              <Button size='small' onClick={() => setShowFullDescription(true)}>Read more</Button>
+            )}
+            {showFullDescription && <Button size='small' onClick={() => setShowFullDescription(false)}>Read less</Button>}
+          </Typography> 
+          </Stack>
           } 
         </CardContent>
         <Stack>
