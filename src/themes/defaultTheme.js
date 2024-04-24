@@ -37,7 +37,7 @@ export const textFieldStyle = {
       backgroundColor: "#3a3b3c",
       width: '320px', height: '50px',
       borderRadius: '25px', border: 'none',
-      marginRight: '10px',
+      marginRight: '5px',
     
     
   }

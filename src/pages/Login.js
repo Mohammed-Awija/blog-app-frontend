@@ -1,16 +1,18 @@
 import {useState} from 'react'
 import {useLogin} from '../hooks/useLogin'
-import {Stack, Typography, TextField, Button} from '@mui/material'
+import {Stack, Typography, TextField, Button, Alert} from '@mui/material'
 import { style } from '../themes/defaultTheme'
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const {login, error, loading} = useLogin()
+    const {login, error, setError, loading} = useLogin()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
+        if(!email || !password){
+          return setError('All fields are required')
+         }
         await login(email, password)
     }
 
@@ -19,7 +21,7 @@ export default function Login() {
         <Typography color={style.textColor} m={1} variant='h4'>Login</Typography>
         {loading ? <Typography variant='subtitle2' color={style.textColor}>Loading...</Typography> :
         <Stack spacing={1} width='360px'>
-          {error && <h3>{error}</h3>}
+          {error && <Alert severity="warning">{error}</Alert>}
             <TextField 
             sx={{ 
               "& .MuiOutlinedInput-root": {

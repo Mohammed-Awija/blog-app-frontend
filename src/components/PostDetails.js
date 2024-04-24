@@ -78,6 +78,10 @@ const handleEdit = async (e) => {
     return setError('Post id not found');
   }
   if(post.title === title && post.description === description && image === null){
+    setEdit(false);
+    setTimeout(() => {
+      setError(null)
+    }, 3000)
     return setError('No no changes are made')
   }
   const formData = new FormData();
@@ -135,6 +139,9 @@ const likePost = async (post) => {
 }
 
 const handleComment = async (post) => {
+  if(!comment){
+    return setError("Field is required")
+  }
   try {
     const res = await fetch(`/api/v1/comment-post/${post._id}`, {
       method: 'PATCH',
@@ -160,6 +167,9 @@ const handleComment = async (post) => {
 }
 
 const submitReply = async (post, commentId, reply) => {
+  if(!reply){
+    return setError("Field is required")
+  }
   try {
     const res = await fetch(`/api/v1/reply-post/${post._id}/${commentId}`, {
       method: 'PATCH',
@@ -185,8 +195,6 @@ const submitReply = async (post, commentId, reply) => {
   }
 }
 
-
-
   return (
     <Card sx={{ maxWidth: '500px', margin: '15px auto', backgroundColor: '#242526' }}>
       {error && <Alert severity="warning">{error}</Alert>}
@@ -198,7 +206,7 @@ const submitReply = async (post, commentId, reply) => {
         } 
         action={
           <IconButton sx={{ color: style.textColor }} aria-label="settings" onClick={(e) => setShowMenu(e.currentTarget)}>
-            <MoreVertIcon />
+            {user && user.username === post.createdBy ? <MoreVertIcon /> : null}
           </IconButton>
         }
         title={user.username === post.createdBy ? <Typography variant='subtitle1' color='	#e4e6eb'>You</Typography> : <Typography variant='subtitle1' color='	#e4e6eb'>{post && post.createdBy}</Typography>}
@@ -220,9 +228,8 @@ const submitReply = async (post, commentId, reply) => {
                 open={Boolean(showMenu)}
                 onClose={() => setShowMenu(null)}
               >
-                <MenuItem onClick={() => setShowMenu(null)}>Save Post</MenuItem>
-                {user.username === post.createdBy ? <MenuItem onClick={() => editPost(post)}>Edit Post</MenuItem> : null}
-                {user.username === post.createdBy ? <MenuItem onClick={deletePost}>Delete Post</MenuItem> : null}
+                <MenuItem onClick={() => editPost(post)}>Edit Post</MenuItem>
+                <MenuItem onClick={deletePost}>Delete Post</MenuItem>
             </Menu>
             {edit ? 
               <CardMedia
@@ -247,11 +254,11 @@ const submitReply = async (post, commentId, reply) => {
           <TextField sx={ inputStyle } value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined'/>
           <TextField multiline rows={Math.max(Math.ceil(description.length / 40), 2)} sx={ inputStyle }  value={description} onChange={(e) => setDescription(e.target.value)} variant='outlined'/>
           <Button onClick={handleEdit} variant='contained'>Submit</Button>
-          <Button onClick={() => setEdit(false)} variant='contained'>Cancel</Button>
+          <Button onClick={() => setEdit(false)} variant='outlined'>Cancel</Button>
           </Stack>
           :
           <Stack>
-          <Typography variant='h6' color={style.textColor}>{post.title}</Typography>
+          <Typography sx={{ margin: '10px 0' }} variant='h5' color={style.textColor}>{post.title}</Typography>
           <Typography multiline  variant='subtitle1' color={style.textColor}>
             {showFullDescription ? post.description : `${post.description.slice(0, 300)}...`}
             
@@ -309,7 +316,7 @@ const submitReply = async (post, commentId, reply) => {
                 padding: '10px',
                 wordWrap: "break-word",
                 color: style.textColor,
-                width: '150px'
+                width: comment.comment.length * 8
                 }} variant='subtitle2'>{comment.comment}</Typography>
                 <Stack sx={{ maxWidth: '440px'}}>
                 {commentId === comment._id ? 
@@ -344,7 +351,7 @@ const submitReply = async (post, commentId, reply) => {
                     padding: '10px',
                     wordWrap: "break-word",
                     color: style.textColor,
-                    width: '150px',
+                    width: re.reply.length * 8,
                     margin: '5px 20px'
                     }} variant='subtitle2'>{re.reply}</Typography>
                 </Stack>

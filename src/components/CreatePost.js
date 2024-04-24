@@ -28,7 +28,10 @@ export default function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if(!user){
-      return setError('You must be logged in!!!')
+      return setError('You must be logged in')
+   }
+   if(!title || !description || !image){
+    return setError('All fields are required')
    }
    const formData = new FormData();
    formData.append('title', title);
@@ -65,7 +68,6 @@ export default function CreatePost() {
 
   return (
     <Card sx={{ maxWidth: '500px', margin: '15px auto', backgroundColor: '#242526' }}>
-      {error && <Alert severity="warning">{error}</Alert>}
       {create ? 
       <>
       <CardHeader 
@@ -89,6 +91,7 @@ export default function CreatePost() {
         />
         <CardContent>
           <Stack spacing={1.5} direction='column' >
+          {error && <Alert severity="warning">{error}</Alert>}
             <TextField sx={inputStyle} type='file' onChange={selectedImage} accept='image/*'/>
             <TextField sx={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} variant='outlined' label="Title"/>
             <TextField sx={inputStyle} value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={5} label="Description..." variant='outlined'/>
@@ -104,8 +107,7 @@ export default function CreatePost() {
             {user && user.username[0].toUpperCase()}
           </Avatar>
         } 
-        
-        title={<Typography variant='subtitle1' color='	#e4e6eb'>{user && user.username}</Typography>}
+        title={<Typography sx={{ margin: '0 -5px' }} variant='subtitle1' color='	#e4e6eb'>{user && user.username.length < 10 ? user.username : user.username.substring(0, 8)}</Typography>}
         />
         
         <CardContent>

@@ -28,5 +28,5 @@ export function useLogin (){
         dispatch({type: 'LOGIN', payload: json})
         setLoading(false)
     }
-  return {login, loading, error}
+  return {login, loading, error, setError}
 }

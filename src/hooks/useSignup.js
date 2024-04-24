@@ -28,5 +28,5 @@ export function useSignup (){
         dispatch({type: 'LOGIN', payload: json})
         setLoading(false)
     }
-  return {signup, loading, error}
+  return {signup, loading, error, setError}
 }

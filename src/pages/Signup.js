@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import { useSignup } from '../hooks/useSignup'
-import {Stack, Typography, TextField, Button} from '@mui/material'
+import {Stack, Typography, TextField, Button, Alert} from '@mui/material'
 import { style } from '../themes/defaultTheme'
 
 export default function Signup() {
@@ -8,11 +8,29 @@ export default function Signup() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const {signup, error, loading} = useSignup()
+    const {signup, error, loading, setError} = useSignup()
+    //password validator
+    const minLength = /.{8,}/
+    const minLowercase = /[a-z]/
+    const minUppercase = /[A-Z]/
+    const minNumbers = /\d/
+    const minSymbols = /[\W_]/
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
+        if(!username || !email || !password || !confirmPassword){
+          return setError('All fields are required')
+        }
+        if(!minLength.test(password) || 
+        !minLowercase.test(password) ||
+        !minUppercase.test(password) ||
+        !minNumbers.test(password) ||
+        !minSymbols.test(password)){
+          return setError('Password is not strong enough')
+        }
+        if(password !== confirmPassword){
+          return setError('Passwords are not the same')
+        }
         await signup(username, email, password)
     }
 
@@ -21,7 +39,7 @@ export default function Signup() {
         <Typography color={style.textColor} m={1} variant='h4'>Sign up</Typography>
         {loading ? <Typography variant='subtitle2' color={style.textColor}>Loading...</Typography> :
         <Stack spacing={1} width='360px'>
-            {error && <h3>{error}</h3>}
+            {error && <Alert severity="warning">{error}</Alert>}
             <TextField 
             sx={{ 
               "& .MuiOutlinedInput-root": {
