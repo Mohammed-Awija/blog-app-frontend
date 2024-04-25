@@ -2,7 +2,7 @@
 export const style = {
     textColor: '#e4e6eb',
     darkBgColor: '#18191a',
-    bgcolor: '#242526',
+    bgcolor: '#303133',
     main: '#FF5700',
 }
 

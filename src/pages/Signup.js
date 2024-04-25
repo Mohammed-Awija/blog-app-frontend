@@ -1,13 +1,17 @@
 import {useState} from 'react'
 import { useSignup } from '../hooks/useSignup'
-import {Stack, Typography, TextField, Button, Alert} from '@mui/material'
+import {Stack, Typography, TextField, Button, Alert, InputAdornment} from '@mui/material'
 import { style } from '../themes/defaultTheme'
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import IconButton from '@mui/material/IconButton';
 
 export default function Signup() {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const {signup, error, loading, setError} = useSignup()
     //password validator
     const minLength = /.{8,}/
@@ -32,6 +36,7 @@ export default function Signup() {
           return setError('Passwords are not the same')
         }
         await signup(username, email, password)
+        setShowPassword(false)
     }
 
   return (
@@ -86,12 +91,20 @@ export default function Signup() {
             color: style.textColor,
             },
             }}
-            type='password'
+            type={showPassword ? 'text' : 'password'}
             label="Password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            InputProps={{
+              endAdornment:  
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: style.bgcolor }} aria-label="toggle password visibility">
+                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+              </IconButton>
+            </InputAdornment>
+            }}
             />
-                        <TextField 
+            <TextField 
             sx={{ 
                 "& .MuiOutlinedInput-root": {
                 color: "#b0b3b8",
@@ -103,10 +116,18 @@ export default function Signup() {
             color: style.textColor,
             },
             }}
-            type='password'
+            type={showPassword ? 'text' : 'password'}
             label="Confirm Password"
             onChange={(e) => setConfirmPassword(e.target.value)}
             value={confirmPassword}
+            InputProps={{
+              endAdornment:  
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: style.bgcolor }} aria-label="toggle password visibility">
+                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+              </IconButton>
+            </InputAdornment>
+            }}
             />
             <Button variant='contained' onClick={handleSubmit} disabled={loading}>Sign up</Button>
         </Stack>
